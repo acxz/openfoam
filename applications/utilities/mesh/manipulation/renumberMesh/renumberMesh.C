@@ -31,10 +31,11 @@ Group
     grpMeshManipulationUtilities
 
 Description
-    Renumbers the cell list in order to reduce the bandwidth, reading and
-    renumbering all fields from all the time directories.
+    Renumbers the cell list in order to reduce the bandwidth or fill-in,
+    reading and renumbering all fields from all the time directories.
 
-    By default uses bandCompression (CuthillMcKee) but will
+    By default uses nested dissection (metisRenumber) if built with METIS,
+    otherwise uses built-in (band compression) CuthillMcKee but will
     read system/renumberMeshDict if -dict option is present
 
 \*---------------------------------------------------------------------------*/
@@ -64,6 +65,9 @@ Description
     #include "zoltanRenumber.H"
 #endif
 
+#ifdef HAVE_METIS
+    #include "metisRenumber.H"
+#endif
 
 using namespace Foam;
 
@@ -770,7 +774,11 @@ int main(int argc, char *argv[])
         {
             Info<< "Using default renumberMethod." << nl << endl;
             dictionary renumberDict;
+#ifdef HAVE_METIS
+            renumberPtr.reset(new metisRenumber(renumberDict));
+#else
             renumberPtr.reset(new CuthillMcKeeRenumber(renumberDict));
+#endif
         }
 
         Info<< "Selecting renumberMethod " << renumberPtr().type() << nl
