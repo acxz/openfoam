@@ -1,0 +1,3 @@
+metisRenumber.C
+
+LIB = $(FOAM_LIBBIN)/libmetisRenumber

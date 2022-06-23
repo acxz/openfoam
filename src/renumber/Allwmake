@@ -3,11 +3,20 @@ cd "${0%/*}" || exit                                # Run from this directory
 targetType=libso                                    # Preferred library type
 . ${WM_PROJECT_DIR:?}/wmake/scripts/AllwmakeParseArguments
 . ${WM_PROJECT_DIR:?}/wmake/scripts/have_boost
+. ${WM_PROJECT_DIR:?}/wmake/scripts/have_metis
 . ${WM_PROJECT_DIR:?}/wmake/scripts/have_zoltan
 
 #------------------------------------------------------------------------------
 
 wmake $targetType renumberMethods
+
+warning="==> skip metisRenumber"
+if have_metis
+then
+    wmake $targetType metisRenumber || echo "$warning (build issues detected)"
+else
+    echo "$warning (no metis)"
+fi
 
 warning="==> skip SloanRenumber"
 if have_boost
